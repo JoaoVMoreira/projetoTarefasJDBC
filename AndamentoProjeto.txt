@@ -1,0 +1,15 @@
+Planejamento
+> Criar diagrama
+> Criar pacotes
+> Iniciar Criação das classes
+> Criar Banco de dados
+> Criar Pool de conexões
+> Criar Bancos de dados a serem utilizados
+>>Listar utilidades
+> Criar View
+> Criar DAOs
+> Criar utilidades
+> Vincular utilidades
+> Testes 
+> Tratar exceptions
+> Resolver bugs
