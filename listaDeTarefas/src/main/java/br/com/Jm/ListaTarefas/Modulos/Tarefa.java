@@ -3,12 +3,15 @@ package br.com.Jm.ListaTarefas.Modulos;
 public class Tarefa {
     private Integer id;
     private String nome;
-    private Boolean status = false;
+    private Boolean status;
     private String descricao;
+    private Integer categoria_id = 1;
 
-    public Tarefa(String nome, String descricao) {
+    public Tarefa(String nome, String descricao, Integer categoria_id, Boolean status) {
         this.nome = nome;
         this.descricao = descricao;
+        this.categoria_id = categoria_id;
+        this.status = status;
     }
 
     public String getNome() {
@@ -29,5 +32,9 @@ public class Tarefa {
 
     public Integer getId() {
         return id;
+    }
+
+    public Integer getCategoria_id() {
+        return this.categoria_id;
     }
 }

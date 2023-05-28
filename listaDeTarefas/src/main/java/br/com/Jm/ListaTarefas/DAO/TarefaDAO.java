@@ -8,61 +8,64 @@ import java.util.List;
 
 public class TarefaDAO {
     private Connection connection;
-    public List<Tarefa> Listar(Connection connection) throws SQLException {
+    public TarefaDAO(Connection connection){
+        this.connection = connection;
+    }
+    public List<Tarefa> Listar(){
         List<Tarefa> tarefas = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM TAREFA";
+            try (PreparedStatement str = connection.prepareStatement(sql);) {
+                str.execute();
 
-        String sql = "SELECT * FROM TAREFA";
-        try (PreparedStatement str = connection.prepareStatement(sql);){
-            str.execute();
-
-            try(ResultSet rs = str.getResultSet()){
-                while (rs.next()){
-                    Tarefa tarefa =
-                            new Tarefa(rs.getString(2), rs.getString(3));
-                    tarefas.add(tarefa);
+                try (ResultSet rs = str.getResultSet()) {
+                    while (rs.next()) {
+                        Tarefa tarefa =
+                                new Tarefa(rs.getString(2), rs.getString(4), rs.getInt(5), rs.getBoolean(3));
+                        tarefas.add(tarefa);
+                    }
                 }
             }
+            return tarefas;
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+            return null;
         }
-        return tarefas;
     }
-    public void Inserir(Connection connection, Tarefa tarefa) throws SQLException {
-        String sql = "INSERT INTO TAREFA (NOME, STATUS, DESCRICAO) VALUE(?, ?, ?)";
+    public void Inserir( Tarefa tarefa){
+        String sql = "INSERT INTO TAREFA (NOME, STATUS, DESCRICAO, CATEGORIA_ID) VALUE(?, ?, ?, ?)";
+        try {
 
-        try(PreparedStatement prst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
-            prst.setString(1, tarefa.getNome());
-            prst.setBoolean(2, tarefa.getStatus());
-            prst.setString(3, tarefa.getDescricao());
-            prst.execute();
+            try (PreparedStatement prst = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                prst.setString(1, tarefa.getNome());
+                prst.setBoolean(2, tarefa.getStatus());
+                prst.setString(3, tarefa.getDescricao());
+                prst.setInt(4, tarefa.getCategoria_id());
+                prst.execute();
 
-            try(ResultSet rs = prst.getGeneratedKeys()){
-                while(rs.next()){
-                    tarefa.setId(rs.getInt(1));
+                try (ResultSet rs = prst.getGeneratedKeys()) {
+                    while (rs.next()) {
+                        tarefa.setId(rs.getInt(1));
+                    }
                 }
             }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
         }
     }
-    public void Exlcuir(Connection connection, Integer id) throws SQLException{
+    public void Exlcuir(Integer id){
         String sql = "DELETE FROM TAREFA WHERE ID = ?";
-
-        try(PreparedStatement pr = connection.prepareStatement(sql)){
-            pr.setInt(1, id);
-            try{
-                pr.execute();
+        try {
+            try (PreparedStatement pr = connection.prepareStatement(sql)) {
+                pr.setInt(1, id);
+                try {
+                    pr.execute();
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
-            catch (Exception e){
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-    public void Concluir(Connection connection, Tarefa tarefa) throws SQLException {
-        String sql = "";
-        if(tarefa.getStatus()){
-            sql = "UPDATE TAREFA SET STATUS = TRUE WHERE ID = ?";
-        }else{
-            sql = "UPDATE TAREFA SET STATUS = FALSE WHERE ID = ?";
-        }
-        try(PreparedStatement pr = connection.prepareStatement(sql)){
-            pr.execute();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
         }
     }
 

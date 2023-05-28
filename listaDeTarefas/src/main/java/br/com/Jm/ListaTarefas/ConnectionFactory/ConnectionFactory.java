@@ -6,11 +6,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class ConnectionFactory {
-    public Connection CriaConeccao() throws SQLException {
-        ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
-        comboPooledDataSource.setJdbcUrl("jdbc:mysql://localhost/listaTarefas?");
-        comboPooledDataSource.setUser("root");
-        comboPooledDataSource.setPassword("root");
-        return comboPooledDataSource.getConnection();
+    public Connection CriaConeccao(){
+        try {
+            ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
+            comboPooledDataSource.setJdbcUrl("jdbc:mysql://localhost/listaTarefas?");
+            comboPooledDataSource.setUser("root");
+            comboPooledDataSource.setPassword("root");
+            return comboPooledDataSource.getConnection();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 }

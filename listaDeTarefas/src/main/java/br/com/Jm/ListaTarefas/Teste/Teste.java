@@ -12,32 +12,37 @@ import java.sql.SQLException;
 public class Teste {
     public static void main(String[] args) throws SQLException {
         try(Connection con = new ConnectionFactory().CriaConeccao()){
-            TarefaDAO tarefaDAO = new TarefaDAO();
-            CategoriaDAO categoriaDAO = new CategoriaDAO();
-            Tarefa tarefa2 = new Tarefa("Teste", "Testando inserção");
+            TarefaDAO tarefaDAO = new TarefaDAO(con);
+            CategoriaDAO categoriaDAO = new CategoriaDAO(con);
+            //Tarefa tarefa2 = new Tarefa("Teste", "Testando inserção");
 
-            tarefaDAO.Inserir(con, new Tarefa("Limpar caixa de areia", "Limpar caixa de areia do gato"));
+            //tarefaDAO.Inserir(new Tarefa("Limpar caixa de areia", "Limpar caixa de areia do gato"));
+            //Tarefa tarefa = new Tarefa("Testando", "mais um teste", 1);
 
-            for (Tarefa tarefa : tarefaDAO.Listar(con)) {
-                System.out.println("Nome:" + tarefa.getNome());
-                System.out.println("Status: " + tarefa.getStatus());
-                System.out.println("Descricao: " + tarefa.getDescricao());
-            }
+//            for (Tarefa tarefa : tarefaDAO.Listar()) {
+//                System.out.println("Nome:" + tarefa.getNome());
+//                System.out.println("Status: " + tarefa.getStatus());
+//                System.out.println("Descricao: " + tarefa.getDescricao());
+//                System.out.println("Categoria_id: "  + tarefa.getCategoria_id());
+//            }
+//
+//            System.out.println("*****************************");
 
-            System.out.println("*****************************");
-
-            for (Categoria categoria: categoriaDAO.listar(con)) {
-                System.out.println(categoria.getNome());
-            }
-
-            System.out.println("*****************************");
+//            for (Categoria categoria: categoriaDAO.listar()) {
+//                System.out.println(categoria.getNome());
+//            }
+//
+//            System.out.println("*****************************");
 
 
-            for (Categoria categoria : categoriaDAO.listarCategoria(con)) {
-                for (Tarefa tarefa:categoria.getListaTarefas()) {
+            for (Categoria categoria : categoriaDAO.listarCategoria()) {
+                for (Tarefa tarefa:categoria.getTarefas()) {
                     System.out.println(tarefa.getNome() + "-" + categoria.getNome());
                 }
             }
+
+            System.out.println("*****************************");
+
 
         }
     }
