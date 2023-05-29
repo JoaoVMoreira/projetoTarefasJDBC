@@ -100,7 +100,6 @@ public class TarefaView extends JFrame{
                 salvar();
                 limpar();
                 preencherTabela();
-                JOptionPane.showMessageDialog(null, "Inseção realizada");
             }
         });
 
@@ -110,7 +109,7 @@ public class TarefaView extends JFrame{
                 excluir();
                 limpar();
                 preencherTabela();
-                JOptionPane.showMessageDialog(null, "Tarefa excluida");
+
             }
         });
 
@@ -120,7 +119,7 @@ public class TarefaView extends JFrame{
                 concluir();
                 limpar();
                 preencherTabela();
-                JOptionPane.showMessageDialog(null, "Tarefa concluida");
+
             }
         });
 
@@ -136,8 +135,13 @@ public class TarefaView extends JFrame{
     public void salvar(){
         try{
             Categoria categoria = (Categoria) inputCategoria.getSelectedItem();
-            Tarefa tarefa = new Tarefa(inputNome.getText(), inputDescricao.getText(), categoria.getId(), false);
-            this.controllerTarefa.Salvar(tarefa);
+            if(inputNome.getText().length() == 0 || inputDescricao.getText().length() == 0){
+                JOptionPane.showMessageDialog(null,"Favor preencher todos os campos");
+            }else{
+                Tarefa tarefa = new Tarefa(inputNome.getText(), inputDescricao.getText(), categoria.getId(), false);
+                this.controllerTarefa.Salvar(tarefa);
+                JOptionPane.showMessageDialog(null, "Inseção realizada");
+            }
         }catch (Exception e){
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this,"Inseção não realizada");
@@ -177,21 +181,31 @@ public class TarefaView extends JFrame{
     }
 
     public void concluir(){
-        Integer id = (Integer) tabela.getValueAt(tabela.getSelectedRow(), 0);
-        List<Categoria> listaDeTarefas = this.controllerCategoria.listTarefasComCategoria();
-        for (Categoria categoria:listaDeTarefas) {
-            for (Tarefa tarefa:categoria.getTarefas()) {
-                if(id == tarefa.getId()){
-                    this.controllerCategoria.Concluir(tarefa);
+        if(tabela.getSelectedRow() == -1){
+            JOptionPane.showMessageDialog(null, "Favor selecione uma tarefa");
+        }else{
+            Integer id = (Integer) tabela.getValueAt(tabela.getSelectedRow(), 0);
+            List<Categoria> listaDeTarefas = this.controllerCategoria.listTarefasComCategoria();
+            for (Categoria categoria:listaDeTarefas) {
+                for (Tarefa tarefa:categoria.getTarefas()) {
+                    if(id == tarefa.getId()){
+                        this.controllerCategoria.Concluir(tarefa);
+                    }
                 }
             }
+            JOptionPane.showMessageDialog(null, "Tarefa concluida");
         }
-
     }
 
     public void excluir(){
-        Integer id = (Integer) tabela.getValueAt(tabela.getSelectedRow(), 0);
-        this.controllerTarefa.Excluir(id);
+        if(tabela.getSelectedRow() == -1){
+            JOptionPane.showMessageDialog(null, "Favor selecione uma tarefa");
+        }else{
+            Integer id = (Integer) tabela.getValueAt(tabela.getSelectedRow(), 0);
+            this.controllerTarefa.Excluir(id);
+            JOptionPane.showMessageDialog(null, "Tarefa excluida");
+        }
+
     }
 
     public List<Categoria> lista(){
