@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+    <!--
+    RESOURCE_LOCAL - Transação local
+    JTA - Quando o banco de dados se responsabiliza pela transação
+    -->
+    <persistence-unit name="gerenciador_tarefas" transaction-type="RESOURCE_LOCAL"> <!--A cada banco de dados um novo persistence-unit-->
+
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" /> <!--Driver-->
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/gerenciador_tarefas?useTimezone=true&amp;serverTimezone=UTC" /> <!--URL banco de dados-->
+            <property name="javax.persistence.jdbc.user" value="root" /> <!--User-->
+            <property name="javax.persistence.jdbc.password" value="" /> <!--Senha-->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect" /><!--Config Hibernate-->
+            <property name="hibernate.hbm2ddl.auto" value="update" /><!--Cria tabelas e colunas automaticamente-->
+        </properties>
+    </persistence-unit>
+</persistence>

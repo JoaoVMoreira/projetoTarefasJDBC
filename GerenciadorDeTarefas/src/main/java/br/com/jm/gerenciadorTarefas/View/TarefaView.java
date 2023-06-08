@@ -1,19 +1,18 @@
-package br.com.Jm.ListaTarefas.View;
+package br.com.jm.gerenciadorTarefas.View;
 
-import br.com.Jm.ListaTarefas.Controller.ControllerCategoria;
-import br.com.Jm.ListaTarefas.Controller.ControllerTarefa;
-import br.com.Jm.ListaTarefas.DAO.TarefaDAO;
-import br.com.Jm.ListaTarefas.Modulos.Categoria;
-import br.com.Jm.ListaTarefas.Modulos.Tarefa;
+import br.com.jm.gerenciadorTarefas.Controller.ControllerCategoria;
+import br.com.jm.gerenciadorTarefas.Controller.ControllerTarefa;
+import br.com.jm.gerenciadorTarefas.Mods.Categoria;
+import br.com.jm.gerenciadorTarefas.Mods.Tarefa;
+import br.com.jm.gerenciadorTarefas.VO.CategoriaTarefaVO;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class TarefaView extends JFrame{
+public class TarefaView extends JFrame {
 
     private DefaultTableModel modelo;
     private JButton excluiBtn, concluirBtn, filtroBtn, salvaBtn;
@@ -57,7 +56,7 @@ public class TarefaView extends JFrame{
 
         inputCategoria = new JComboBox<Categoria>();
         inputCategoria.setBounds(310, 145, 200, 30);
-        List<Categoria> categoria = lista();
+        List<Categoria> categoria = listaCategoria();
         for (Categoria cat: categoria) {
             inputCategoria.addItem(cat);
         }
@@ -94,22 +93,12 @@ public class TarefaView extends JFrame{
 
         setVisible(true); //Deixando a pagina visivel
 
-        salvaBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                salvar();
-                limpar();
-                preencherTabela();
-            }
-        });
-
         excluiBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 excluir();
-                limpar();
+                limparTabela();
                 preencherTabela();
-
             }
         });
 
@@ -117,99 +106,94 @@ public class TarefaView extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 concluir();
-                limpar();
+                limparTabela();
                 preencherTabela();
-
             }
         });
 
         filtroBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                limpar();
-                preencherCategoria();
+                limparTabela();
+                listaFiltrada();
             }
         });
-    }
 
-    public void salvar(){
-        try{
-            Categoria categoria = (Categoria) inputCategoria.getSelectedItem();
-            if(inputNome.getText().length() == 0 || inputDescricao.getText().length() == 0){
-                JOptionPane.showMessageDialog(null,"Favor preencher todos os campos");
-            }else{
-                Tarefa tarefa = new Tarefa(inputNome.getText(), inputDescricao.getText(), categoria.getId(), false);
-                this.controllerTarefa.Salvar(tarefa);
-                JOptionPane.showMessageDialog(null, "Inseção realizada");
+        salvaBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                incluirTarefa();
+                limparTabela();
+                preencherTabela();
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            JOptionPane.showMessageDialog(this,"Inseção não realizada");
-        }
+        });
+
+
     }
 
     public void preencherTabela(){
-        List<Categoria> listaDeTarefas = this.controllerCategoria.listTarefasComCategoria();
-        for (Categoria categoria: listaDeTarefas) {
-            for (Tarefa tarefa : categoria.getTarefas()) {
-                String status = "Pendente";
-                if(tarefa.getStatus()){
-                    status = "Concluido";
-                }
-                modelo.addRow(new Object[] {tarefa.getId(), tarefa.getNome(), status, tarefa.getDescricao(), categoria.getNome()});
+        List<CategoriaTarefaVO> list = controllerTarefa.listTarefas();
+        String status = "Pendente";
+        for (CategoriaTarefaVO tarefa:list) {
+            if (tarefa.getStatus() == true){
+                status = "Concluido";
             }
+            modelo.addRow(new Object[] {tarefa.getId(), tarefa.getNome(), tarefa.getDescricao(), status, tarefa.getCategoria()});
         }
     }
 
-    public void preencherCategoria(){
+    public void listaFiltrada(){
+        String status = "Concluido";
         Categoria cat = (Categoria) inputCategoria.getSelectedItem();
         Integer id = cat.getId();
-        List<Categoria> listaDeTarefas = this.controllerCategoria.filtrar(id);
-        for (Categoria categoria: listaDeTarefas) {
-            for (Tarefa tarefa : categoria.getTarefas()) {
-                String status = "Pendente";
-                if(tarefa.getStatus()){
-                    status = "Concluido";
-                }
-                modelo.addRow(new Object[] {tarefa.getId(), tarefa.getNome(), status, tarefa.getDescricao(), categoria.getNome()});
+        List<CategoriaTarefaVO> list = controllerCategoria.filtrar(id);
+        for (CategoriaTarefaVO tarefa:list) {
+            if (tarefa.getStatus() == false){
+                status = "Pendente";
             }
+            modelo.addRow(new Object[] {tarefa.getId(), tarefa.getNome(), tarefa.getDescricao(), status, tarefa.getCategoria()});
         }
+        JOptionPane.showMessageDialog(null, "Lista Filtrada com sucesso!");
+
     }
 
-    public void limpar(){
-        modelo.setRowCount(0);
+    public List<Categoria> listaCategoria(){
+        return this.controllerCategoria.listar();
     }
 
-    public void concluir(){
-        if(tabela.getSelectedRow() == -1){
-            JOptionPane.showMessageDialog(null, "Favor selecione uma tarefa");
+    public void incluirTarefa(){
+        Categoria categoria = (Categoria) inputCategoria.getSelectedItem();
+        if (inputNome.getText().length() == 0 || inputDescricao.getText().length() == 0){
+            JOptionPane.showMessageDialog(null, "Favor preencher todos os campos");
         }else{
-            Integer id = (Integer) tabela.getValueAt(tabela.getSelectedRow(), 0);
-            List<Categoria> listaDeTarefas = this.controllerCategoria.listTarefasComCategoria();
-            for (Categoria categoria:listaDeTarefas) {
-                for (Tarefa tarefa:categoria.getTarefas()) {
-                    if(id == tarefa.getId()){
-                        this.controllerCategoria.Concluir(tarefa);
-                    }
-                }
-            }
-            JOptionPane.showMessageDialog(null, "Tarefa concluida");
+            Tarefa tarefa = new Tarefa(inputNome.getText(), inputDescricao.getText(), categoria);
+            this.controllerTarefa.incluir(tarefa);
+            JOptionPane.showMessageDialog(null, "Tarefa cadastrafda");
         }
+
+    }
+
+    public void limparTabela(){
+        modelo.setRowCount(0);
     }
 
     public void excluir(){
         if(tabela.getSelectedRow() == -1){
-            JOptionPane.showMessageDialog(null, "Favor selecione uma tarefa");
+            JOptionPane.showMessageDialog(null,"Favor selecione uma tarefa");
         }else{
             Integer id = (Integer) tabela.getValueAt(tabela.getSelectedRow(), 0);
-            this.controllerTarefa.Excluir(id);
-            JOptionPane.showMessageDialog(null, "Tarefa excluida");
+            this.controllerTarefa.excluir(id);
+            JOptionPane.showMessageDialog(null, "Tarefa excluida com sucesso!");
         }
-
     }
 
-    public List<Categoria> lista(){
-        return this.controllerCategoria.Listar();
+    public void concluir(){
+        if(tabela.getSelectedRow() == -1){
+            JOptionPane.showMessageDialog(null,"Favor selecione uma tarefa");
+        }else{
+            Integer id = (Integer) tabela.getValueAt(tabela.getSelectedRow(), 0);
+            this.controllerTarefa.concluir(id);
+            JOptionPane.showMessageDialog(null, "Status alterado com sucesso com sucesso!");
+        }
     }
-
 }
