@@ -55,7 +55,7 @@
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/teteusAraujo/I-need-to-learn
+git clone https://github.com/teteusAraujo/I-need-to-learn](https://github.com/JoaoVMoreira/projetoTarefasJDBC.git
 
 # Criar banco de dados MySql com o nome gerenciador_tarefas e user Root (senha = ""). 
 
